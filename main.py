@@ -15,7 +15,7 @@ class App:
         self.main_window.geometry("1200x520+350+100")
 
         self.login_button_main_window = util.get_button(self.main_window, "Login", 'green', self.login)
-        self.login_button_main_window.place(x=750, y=200)
+        self.login_button_main_window.place(x=750, y=300)
 
         self.register_new_user_button_main_window = util.get_button(self.main_window, "Register New User", 'gray',
                                                                     self.register_new_user, fg='black')
@@ -104,6 +104,15 @@ class App:
         self.register_new_user_window.destroy()
 
     def accept_register_new_user(self):
+        unknown_img_path = './.tmp.jpg'
+        cv2.imwrite(unknown_img_path, self.most_recent_capture_arr)
+        output = str(subprocess.check_output(['face_recognition', self.db_dir, unknown_img_path]))
+        name = output.split(',')[1][:-5]
+        if name not in ['unknown_person']:
+            util.msg_box('Oops!', 'User already registered or no persons found. Please try again!')
+            self.register_new_user_window.destroy()
+
+
         name = self.entry_text_register_new_user.get(1.0, "end-1c")
         cv2.imwrite(os.path.join(self.db_dir, '{}.jpg'.format(name)), self.register_new_user_capture)
         util.msg_box('Success!', 'User was registered successfully !')
